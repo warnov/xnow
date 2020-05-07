@@ -12,7 +12,7 @@ namespace WarNov.xnow.WinFormsClient
     {
         static readonly string ws2path = Environment.GetEnvironmentVariable("WS2PATH");
         static readonly string computerName = Environment.GetEnvironmentVariable("COMPUTERNAME");
-        static List<Executable> customExes = ReadCustomExes();
+        static List<Executable> customExes;
         private IKeyboardMouseEvents m_GlobalHook;
 
 
@@ -20,12 +20,19 @@ namespace WarNov.xnow.WinFormsClient
         public FrmMain()
         {
             InitializeComponent();
-            LoadAutoCompleteText();
+            RefreshCommands();
             Subscribe();
+        }
+
+        private void RefreshCommands()
+        {
+            ReadCustomExes();
+            LoadAutoCompleteText();
         }
 
         private void LoadAutoCompleteText()
         {
+
             var source = new AutoCompleteStringCollection();
 
             var currentDir = Path.GetDirectoryName(System.Reflection.Assembly.GetEntryAssembly().Location);
@@ -36,7 +43,7 @@ namespace WarNov.xnow.WinFormsClient
             TxtCommand.AutoCompleteSource = AutoCompleteSource.CustomSource;
         }
 
-        private static List<Executable> ReadCustomExes()
+        private static void ReadCustomExes()
         {
             customExes = new List<Executable>();
             if (Directory.Exists(ws2path))
@@ -53,7 +60,6 @@ namespace WarNov.xnow.WinFormsClient
                     });
                 }
             }
-            return customExes;
         }
 
         private static string GetNameWithoutExtension(string name)
@@ -72,7 +78,7 @@ namespace WarNov.xnow.WinFormsClient
         {
             // Note: for the application hook, use the Hook.AppEvents() instead
             m_GlobalHook = Hook.GlobalEvents();
-            m_GlobalHook.KeyDown += GlobalHook_KeyDown;
+            m_GlobalHook.KeyUp += GlobalHook_KeyUp;
         }
         #endregion
 
@@ -98,7 +104,6 @@ namespace WarNov.xnow.WinFormsClient
             HideForm();
         }
 
-
         private void NtfMain_Click(object sender, EventArgs e)
         {
             ShowForm();
@@ -106,13 +111,13 @@ namespace WarNov.xnow.WinFormsClient
 
         private void FrmMain_FormClosing(object sender, FormClosingEventArgs e)
         {
-            NtfMain.Icon.Dispose();
-            NtfMain.Dispose();
+            NtfMain.Visible = false;
+            Application.DoEvents();
         }
         #endregion
 
         #region UI Tasks
-        private void ExitApplication()
+        private void HideApplication()
         {
             HideForm();
         }
@@ -120,7 +125,8 @@ namespace WarNov.xnow.WinFormsClient
         private void HideForm()
         {
             Hide();
-            NtfMain.Visible = true;
+            if (NtfMain == null)
+                NtfMain.Visible = true;
         }
 
         private void ShowForm()
@@ -134,28 +140,23 @@ namespace WarNov.xnow.WinFormsClient
         #endregion
 
         #region Command Processing
-        private void GlobalHook_KeyDown(object sender, KeyEventArgs e)
+        private void GlobalHook_KeyUp(object sender, KeyEventArgs e)
         {
             //Keyboard handling when app is opened
             if (Visible)
             {
                 if (e.KeyCode == Keys.Enter)
-                {
-                    e.Handled = true;
                     ProcessCommand();
-                }
-                if (e.KeyCode == Keys.Escape)
-                {
-                    e.Handled = true;
-                    ExitApplication();
-                }
+                else if (e.KeyCode == Keys.Escape)
+                    HideApplication();
+                else if (e.KeyCode == Keys.F5)
+                    RefreshCommands();
             }
             //form hidden
             else
             {
                 if (e.KeyCode == Keys.Multiply && e.Shift && e.Control)
                 {
-                    e.Handled = true;
                     ShowForm();
                     Activate();
                 }
