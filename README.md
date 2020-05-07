@@ -7,9 +7,11 @@ After you press enter, the application just hides in the notifications of the ta
 
 It will be more than ready for another command.
 
-Besides "normal" Windows commands, you can create a folder of custom shortcuts with short names taht could be invoked from xnow. 
+Besides "normal" Windows commands, you can create a folder of custom shortcuts with short names taht could be invoked from **xnow**. 
 
-For example you can create a shortcut link called `vs.lnk`, put it in the special folder you created for this, and then just write inside xnow: "vs" and press enter. In this moment Visual Studio will open without requiring you to fill your taskbar with shortcuts or having to open the start menu.
+For example you can create a shortcut link called `vs.lnk`, put it in the special folder you created for this, and then just write inside **xnow**: `"vs"` and press enter. 
+
+In this moment Visual Studio will open without requiring you to fill your taskbar with shortcuts or having to open the start menu.
 <!--stackedit_data:
-eyJoaXN0b3J5IjpbOTAxMDU1OTExLC0yNDk2NzgwMThdfQ==
+eyJoaXN0b3J5IjpbLTYxNzcwODU1NSwtMjQ5Njc4MDE4XX0=
 -->
