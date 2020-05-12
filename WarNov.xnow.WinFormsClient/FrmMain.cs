@@ -259,7 +259,7 @@ namespace WarNov.xnow.WinFormsClient
         {
             var searchString = HttpUtility.UrlEncode(command.Remove(command.Length - 1));
             var finalUrl = $"https://www.google.com/search?q={searchString}";
-            var internetSearchCommand = @$"""C:\Users\warnov\OneDrive\wscript\UNDERBEAST\web.lnk"" {finalUrl}";
+            var internetSearchCommand = $"{Path.Combine(xNowDirPath,"web.lnk")} {finalUrl}";          
             ExecuteCommand(internetSearchCommand);
         }
 
