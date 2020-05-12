@@ -3,16 +3,16 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
-using System.Linq;
+using System.Web;
 using System.Windows.Forms;
 
 namespace WarNov.xnow.WinFormsClient
 {
     public partial class FrmMain : Form
     {
-        static readonly string ws2path = Environment.GetEnvironmentVariable("WS2PATH");
-        static readonly string computerName = Environment.GetEnvironmentVariable("COMPUTERNAME");
         static List<Executable> customExes;
+        //Inside xNowDirPath we can find all of our custom shortcuts plus the autocomplete.txt file for using
+        static readonly string xNowDirPath = Environment.GetEnvironmentVariable("XNOWDIRPATH");
         private IKeyboardMouseEvents m_GlobalHook;
 
 
@@ -32,11 +32,8 @@ namespace WarNov.xnow.WinFormsClient
 
         private void LoadAutoCompleteText()
         {
-
             var source = new AutoCompleteStringCollection();
-
-            var currentDir = Path.GetDirectoryName(System.Reflection.Assembly.GetEntryAssembly().Location);
-            var autoCompleteTextPath = Path.Combine(currentDir, "autocomplete.txt");
+            var autoCompleteTextPath = Path.Combine(xNowDirPath, "autocomplete.txt");
             var autoCompleteLines = File.ReadAllLines(autoCompleteTextPath);
             source.AddRange(autoCompleteLines);
             TxtCommand.AutoCompleteCustomSource = source;
@@ -46,20 +43,18 @@ namespace WarNov.xnow.WinFormsClient
         private static void ReadCustomExes()
         {
             customExes = new List<Executable>();
-            if (Directory.Exists(ws2path))
+
+            foreach (var filePath in Directory.GetFiles(xNowDirPath))
             {
-                var customExesDirPath = Path.Combine(ws2path, computerName);
-                foreach (var filePath in Directory.GetFiles(customExesDirPath))
+                FileInfo file = new FileInfo(filePath);
+                customExes.Add(new Executable()
                 {
-                    FileInfo file = new FileInfo(filePath);
-                    customExes.Add(new Executable()
-                    {
-                        Name = GetNameWithoutExtension(file.Name),
-                        Extension = file.Extension,
-                        FilePath = file.FullName
-                    });
-                }
+                    Name = GetNameWithoutExtension(file.Name),
+                    Extension = file.Extension,
+                    FilePath = file.FullName
+                });
             }
+
         }
 
         private static string GetNameWithoutExtension(string name)
@@ -165,22 +160,117 @@ namespace WarNov.xnow.WinFormsClient
 
         private void ProcessCommand()
         {
+            var command = TxtCommand.Text.ToLower();
             HideForm();
-            ExecuteCommand(TxtCommand.Text);
+            CommandType cmdType = GetCommandType(command, out string modifiedCommand);
+            switch (cmdType)
+            {
+                case CommandType.xnow:
+                    switch (modifiedCommand)
+                    {
+                        //Exit app
+                        case "exit":
+                        case "bye":
+                            NtfMain.Visible = false;
+                            Application.DoEvents();
+                            Environment.Exit(1);
+                            break;
+                    }
+                    break;
+                case CommandType.cmd:
+                    break;
+                case CommandType.shell:
+                    switch (modifiedCommand)
+                    {
+                        case "controlpanel":
+                            ExecuteShell("controlPanelFolder");
+                            break;
+                        case "apps":
+                            ExecuteShell("appsFolder");
+                            break;
+                    }
+                    break;
+                case CommandType.lnk:
+                    ExecuteCommand(modifiedCommand);
+                    break;
+                case CommandType.internetSearch:
+                    ExecuteInternetSearch(modifiedCommand);
+                    break;
+                case CommandType.restCall:
+                    break;
+                default:
+                    break;
+            }
+        }       
+
+        private CommandType GetCommandType(string command, out string modifiedCommand)
+        {
+            modifiedCommand = command;
+            if (command.EndsWith("?"))
+                return CommandType.internetSearch;
+            else
+            {
+                modifiedCommand = command;
+                if (command.EndsWith("?"))
+                    return CommandType.internetSearch;
+                else
+                {
+                    switch (command)
+                    {
+                        //Exit app
+                        case "exit":
+                        case "bye":
+                            return CommandType.xnow;
+                        //Shell Commands
+                        case "controlpanel":
+                        case "apps":
+                            return CommandType.shell;
+                        default:
+                            var lnkPath = LnkPath(command);
+                            if (!String.IsNullOrEmpty(lnkPath))
+                            {
+                                modifiedCommand = lnkPath;
+                                return CommandType.lnk;
+                            }
+                            else
+                            {
+                                return CommandType.cmd;
+                            }
+                    }
+                }
+            }
         }
 
-        void ExecuteCommand(string command)
+        //If the command is a lnk returns its path. Otherwise returns null
+        private string LnkPath(string command)
         {
             var currentExecutable = new Executable()
             {
                 Name = command
             };
-
             if (currentExecutable.InList(customExes))
             {
-                command = currentExecutable.FilePath;
+                return currentExecutable.FilePath;
             }
+            else return null;
+        }
 
+        private void ExecuteInternetSearch(string command)
+        {
+            var searchString = HttpUtility.UrlEncode(command.Remove(command.Length - 1));
+            var finalUrl = $"https://www.google.com/search?q={searchString}";
+            var internetSearchCommand = @$"""C:\Users\warnov\OneDrive\wscript\UNDERBEAST\web.lnk"" {finalUrl}";
+            ExecuteCommand(internetSearchCommand);
+        }
+
+        private void ExecuteShell(string command)
+        {
+            var shellCommand = $"start shell:{command}";
+            ExecuteCommand(shellCommand);
+        }
+
+        void ExecuteCommand(string command)
+        {
             var processInfo = new ProcessStartInfo("cmd.exe", "/c " + command)
             {
                 CreateNoWindow = true,
@@ -197,15 +287,7 @@ namespace WarNov.xnow.WinFormsClient
 
             process.ErrorDataReceived += (object sender, DataReceivedEventArgs e) =>
                 Debug.WriteLine("error>>" + e.Data);
-            process.BeginErrorReadLine();
-
-            process.WaitForExit();
-
-            Debug.WriteLine("ExitCode: {0}", process.ExitCode);
-            process.Close();
-        }
+        }   
         #endregion
-
-
     }
 }
