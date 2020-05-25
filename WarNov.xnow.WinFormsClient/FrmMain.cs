@@ -178,6 +178,7 @@ namespace WarNov.xnow.WinFormsClient
                     }
                     break;
                 case CommandType.cmd:
+                    ExecuteCommand(modifiedCommand, true);
                     break;
                 case CommandType.shell:
                     switch (modifiedCommand)
@@ -201,7 +202,7 @@ namespace WarNov.xnow.WinFormsClient
                 default:
                     break;
             }
-        }       
+        }
 
         private CommandType GetCommandType(string command, out string modifiedCommand)
         {
@@ -259,7 +260,7 @@ namespace WarNov.xnow.WinFormsClient
         {
             var searchString = HttpUtility.UrlEncode(command.Remove(command.Length - 1));
             var finalUrl = $"https://www.google.com/search?q={searchString}";
-            var internetSearchCommand = $"{Path.Combine(xNowDirPath,"web.lnk")} {finalUrl}";          
+            var internetSearchCommand = $"{Path.Combine(xNowDirPath, "web.lnk")} {finalUrl}";
             ExecuteCommand(internetSearchCommand);
         }
 
@@ -269,25 +270,29 @@ namespace WarNov.xnow.WinFormsClient
             ExecuteCommand(shellCommand);
         }
 
-        void ExecuteCommand(string command)
+        void ExecuteCommand(string command, bool conventionalExecution = false)
         {
-            var processInfo = new ProcessStartInfo("cmd.exe", "/c " + command)
+            var executionArgument = conventionalExecution ? "/K" : "/c";
+            var processInfo = new ProcessStartInfo("cmd.exe", $"{executionArgument} {command}")
             {
-                CreateNoWindow = true,
+                CreateNoWindow = !conventionalExecution,
                 UseShellExecute = false,
-                RedirectStandardError = true,
-                RedirectStandardOutput = true
+                RedirectStandardError = !conventionalExecution,
+                RedirectStandardOutput = !conventionalExecution
             };
 
             var process = Process.Start(processInfo);
 
-            process.OutputDataReceived += (object sender, DataReceivedEventArgs e) =>
-                Debug.WriteLine("output>>" + e.Data);
-            process.BeginOutputReadLine();
+            if (!conventionalExecution)
+            {
+                process.OutputDataReceived += (object sender, DataReceivedEventArgs e) =>
+                    Debug.WriteLine("output>>" + e.Data);
+                process.BeginOutputReadLine();
 
-            process.ErrorDataReceived += (object sender, DataReceivedEventArgs e) =>
-                Debug.WriteLine("error>>" + e.Data);
-        }   
+                process.ErrorDataReceived += (object sender, DataReceivedEventArgs e) =>
+                    Debug.WriteLine("error>>" + e.Data);
+            }
+        }
         #endregion
     }
 }
