@@ -10,3 +10,15 @@ D:\src\git\github\WarNov.xnow\WarNov.xnow.WinFormsClient\obj\Debug\WarNov.xnow.W
 D:\src\git\github\WarNov.xnow\WarNov.xnow.WinFormsClient\obj\Debug\WarNov.xnow.WinFormsClient.pdb
 D:\src\git\github\WarNov.xnow\WarNov.xnow.WinFormsClient\bin\Debug\Gma.System.MouseKeyHook.dll
 D:\src\git\github\WarNov.xnow\WarNov.xnow.WinFormsClient\obj\Debug\WarNov.xnow.WinFormsClient.csproj.CopyComplete
+C:\src\xnow\WarNov.xnow.WinFormsClient\bin\Debug\WarNov.xnow.WinFormsClient.exe.config
+C:\src\xnow\WarNov.xnow.WinFormsClient\bin\Debug\WarNov.xnow.WinFormsClient.exe
+C:\src\xnow\WarNov.xnow.WinFormsClient\bin\Debug\WarNov.xnow.WinFormsClient.pdb
+C:\src\xnow\WarNov.xnow.WinFormsClient\bin\Debug\Gma.System.MouseKeyHook.dll
+C:\src\xnow\WarNov.xnow.WinFormsClient\obj\Debug\WarNov.xnow.WinFormsClient.csprojAssemblyReference.cache
+C:\src\xnow\WarNov.xnow.WinFormsClient\obj\Debug\WarNov.xnow.WinFormsClient.FrmMain.resources
+C:\src\xnow\WarNov.xnow.WinFormsClient\obj\Debug\WarNov.xnow.WinFormsClient.Properties.Resources.resources
+C:\src\xnow\WarNov.xnow.WinFormsClient\obj\Debug\WarNov.xnow.WinFormsClient.csproj.GenerateResource.cache
+C:\src\xnow\WarNov.xnow.WinFormsClient\obj\Debug\WarNov.xnow.WinFormsClient.csproj.CoreCompileInputs.cache
+C:\src\xnow\WarNov.xnow.WinFormsClient\obj\Debug\WarNov.xnow.WinFormsClient.csproj.CopyComplete
+C:\src\xnow\WarNov.xnow.WinFormsClient\obj\Debug\WarNov.xnow.WinFormsClient.exe
+C:\src\xnow\WarNov.xnow.WinFormsClient\obj\Debug\WarNov.xnow.WinFormsClient.pdb

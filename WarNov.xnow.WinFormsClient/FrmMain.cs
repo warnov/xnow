@@ -136,7 +136,7 @@ namespace WarNov.xnow.WinFormsClient
 
         #region Command Processing
         private void GlobalHook_KeyUp(object sender, KeyEventArgs e)
-        {
+        {            
             //Keyboard handling when app is opened
             if (Visible)
             {
@@ -150,7 +150,7 @@ namespace WarNov.xnow.WinFormsClient
             //form hidden
             else
             {
-                if (e.KeyCode == Keys.Multiply && e.Shift && e.Control)
+                if ((e.KeyCode == Keys.Oem6||e.KeyCode==Keys.Multiply) && e.Shift && e.Control)
                 {
                     ShowForm();
                     Activate();
